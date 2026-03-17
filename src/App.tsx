@@ -317,7 +317,14 @@ export default function App() {
     const correctAI = tp + fn;
 
     // Mismatch Accuracy (Tasks 8, 9, 10)
-    const mismatchTrials = mainTrials.slice(7, 10);
+    // Mismatch Accuracy (When correctness != trust cue)
+    const mismatchTrials = mainTrials.filter(t => {
+      const stim = stimuli.find(s => s.id === t.stimulus_id);
+      if (!stim) return false;
+      // High trust for incorrect code OR Low trust for correct code
+      return (stim.aiConfidence === "High" && !stim.isCorrect) || (stim.aiConfidence === "Low" && stim.isCorrect);
+    });
+
     const correctMismatch = mismatchTrials.filter(t =>
       (t.decision === "ACCEPT" && t.correctness === 1) ||
       (t.decision === "REJECT" && t.correctness === 0)
